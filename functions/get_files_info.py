@@ -5,31 +5,28 @@ from google.genai import types
 
 
 def get_files_info(working_directory:str, directory:str|None=None)-> str:
-    target_path = os.path.abspath(working_directory)
-    content = os.listdir(working_directory)
+    abs_working_dir = os.path.abspath(working_directory)
+    target_directory = abs_working_dir
     if directory:
-        abs_working = os.path.abspath(working_directory)
-        abs_directory = os.path.abspath(os.path.join(working_directory, directory))
+        target_directory = os.path.abspath(os.path.join(working_directory, directory))
         
-        if not abs_directory.startswith(abs_working):
-            return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
+    if not target_directory.startswith(abs_working_dir):
+        return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
 
-        if not os.path.isdir(abs_directory):
-            return f'Error: "{directory}" is not a directory'
-        target_path = abs_directory
-        content = os.listdir(target_path)
-
-    files_data = ""
-    for file in content:     
-        full_path = os.path.join(target_path, file)
-        try:
+    if not os.path.isdir(target_directory):
+        return f'Error: "{directory}" is not a directory'
+    try:
+        files_info = []
+        for file in os.listdir(target_directory):     
+            full_path = os.path.join(target_directory, file)
             file_size = os.path.getsize(full_path)
             is_dir = os.path.isdir(full_path)
-            files_data += f'- {file}: file_size={file_size} bytes, is_dir={is_dir}\n'
-        except Exception as e:
-            files_data += f'- {file}: Error accessing file info: {e}\n'
-
-    return files_data
+            files_info.append(
+                f"- {file}: file_size={file_size} bytes, is_dir={is_dir}"
+            )
+        return "\n".join(files_info)
+    except Exception as e:
+        return f"Error listing files: {e}"
 
 
 schema_get_files_info = types.FunctionDeclaration(

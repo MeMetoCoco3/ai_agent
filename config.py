@@ -1,4 +1,6 @@
 WORKING_DIR = "./calculator"
+MAX_CANDIDATES = 20
+
 system_prompt = """
     You are a helpful AI coding agent.
 

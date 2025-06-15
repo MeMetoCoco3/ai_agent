@@ -5,6 +5,14 @@ from functions.write_file import write_file, schema_write_file
 from google.genai import types
 from config import WORKING_DIR
 
+avaliable_functions = types.Tool(
+    function_declarations=[
+        schema_get_files_info,
+        schema_get_file_content,
+        schema_run_python_file,
+        schema_write_file,
+    ]
+)
 
 def call_function(function_call_part:types.FunctionCall, verbose:bool = False)->types.Content:
     if verbose:

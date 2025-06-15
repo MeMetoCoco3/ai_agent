@@ -1,3 +1,4 @@
+from typing import Required
 from google.genai import types
 import os
 
@@ -13,19 +14,21 @@ def get_file_content(working_directory:str, file_path:str)->str:
 
     if not os.path.isfile(abs_directory):
         return f'Error: File not found or is not a regular file: "{file_path}"'
+    try:
+        with open(abs_directory, "r") as f:
+            file_content = f.read(MAX_CHARS)
 
-    file_content = ""
-    with open(abs_directory, "r") as f:
-        file_content = f.read(MAX_CHARS)
-
-    if len(file_content) == MAX_CHARS:
-        file_content += f'[...File "{file_path}" truncated at 10000 characters]'
-    return file_content
-
+            if len(file_content) == MAX_CHARS:
+                file_content += f'[...File "{file_path}" truncated at 10000 characters]'
+        return file_content
+    
+    except Exception as e:
+            return f'Error reading file "{file_path}": {e}'
+    
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="Gets the content of a specified file, constrained to the working directory..",
+    description=f"Gets the first {MAX_CHARS} of a specified file, constrained to the working director.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
@@ -34,6 +37,7 @@ schema_get_file_content = types.FunctionDeclaration(
                 description="The path to the file to get the content from.",
             ),
         },
+        required = ["file_path"]
     ),
 )
 

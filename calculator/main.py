@@ -1,4 +1,3 @@
-# main.py
 
 import sys
 from pkg.calculator import Calculator
@@ -24,3 +23,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
